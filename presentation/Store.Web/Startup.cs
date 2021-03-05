@@ -32,7 +32,9 @@ namespace Store.Web
                 options.Cookie.IsEssential = true;
             });
             services.AddSingleton<IBookRepository, BookRepository>();
+            services.AddSingleton<IOrderRepositoty, OrderRepository>();
             services.AddSingleton<BookService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
