@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Store.Contractors;
 using Store.Web.Models;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,18 @@ namespace Store.Web.Controllers
     {
         readonly IBookRepository bookRepository;
         readonly IOrderRepositoty orderRepositoty;
+        readonly IEnumerable<IDeliveryService> deliveryServices;
         readonly INotificationService notificationService;
 
-        public OrderController(IBookRepository bookRepository, IOrderRepositoty orderRepositoty, INotificationService notificationService)
+        public OrderController(
+            IBookRepository bookRepository, 
+            IOrderRepositoty orderRepositoty, 
+            IEnumerable<IDeliveryService> deliveryServices, 
+            INotificationService notificationService)
         {
             this.bookRepository = bookRepository;
             this.orderRepositoty = orderRepositoty;
+            this.deliveryServices = deliveryServices;
             this.notificationService = notificationService;
         }
 
@@ -107,7 +114,7 @@ namespace Store.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult StartDelivery(int id, string cellPhone, int code)
+        public IActionResult Confirmate(int id, string cellPhone, int code)
         {
             int? storedCode = HttpContext.Session.GetInt32(cellPhone);
             if (storedCode == null)            
@@ -119,7 +126,41 @@ namespace Store.Web.Controllers
                 return View("Confirmation", new ConfirmationModel { OrderId = id, CellPhone = cellPhone, 
                     Errors = new Dictionary<string, string> { { "code", "Неверный код" } } });
 
-            return View();
+            //
+
+            HttpContext.Session.Remove(cellPhone);
+
+            var model = new DeliveryModel
+            {
+                OrderId = id,
+                Methods = deliveryServices.ToDictionary(s => s.UniqueCode, s => s.Title),
+            };
+
+            return View("DeliveryMethod", model);
+        }
+
+        [HttpPost]
+        public IActionResult StartDelivery(int id, string uniqueCode)
+        {
+            var deliveryService = deliveryServices.Single(s => s.UniqueCode == uniqueCode);
+            var order = orderRepositoty.GetById(id);
+            var form = deliveryService.CreateForm(order);
+            return View("DeliveryStep", form);
+        }
+
+        [HttpPost]
+        public IActionResult NextDelivery(int id, string uniqueCode, int step, Dictionary<string,string> values)
+        {
+            var deliveryService = deliveryServices.Single(s => s.UniqueCode == uniqueCode);
+
+            var form = deliveryService.MoveNext(id, step, values);
+            
+            if (form.IsFinal)
+            {
+                return null;
+            }
+
+            return View("DeliveryStep", form);
         }
 
         private bool IsValidCellPhone(string cellPhone)
