@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Store.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Store.Web.Controllers
@@ -11,13 +13,16 @@ namespace Store.Web.Controllers
     {
         readonly IBookRepository bookRepository;
         readonly IOrderRepositoty orderRepositoty;
+        readonly INotificationService notificationService;
 
-        public OrderController(IBookRepository bookRepository, IOrderRepositoty orderRepositoty)
+        public OrderController(IBookRepository bookRepository, IOrderRepositoty orderRepositoty, INotificationService notificationService)
         {
             this.bookRepository = bookRepository;
             this.orderRepositoty = orderRepositoty;
+            this.notificationService = notificationService;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             if (HttpContext.Session.TryGetCart(out Cart cart))
@@ -54,6 +59,7 @@ namespace Store.Web.Controllers
             };
         }
 
+        [HttpPost]
         public IActionResult AddItem(int bookId, int count = 1)
         {
             (Order order, Cart cart) = GetOrCreateOrderAndCart();
@@ -72,13 +78,59 @@ namespace Store.Web.Controllers
             return RedirectToAction("Index", "Order");
         }
 
-
+        [HttpPost]
         public IActionResult RemoveItem (int bookId)
         {
             (Order order, Cart cart) = GetOrCreateOrderAndCart();
             order.RemoveItem(bookId);
             SaveOrderAndCart(order, cart);
             return RedirectToAction("Index", "Order");
+        }
+
+        [HttpPost]
+        public IActionResult SendConfirmationCode(int id, string cellPhone)
+        {
+            var order = orderRepositoty.GetById(id);
+            var model = Map(order);
+
+            if (!IsValidCellPhone(cellPhone))
+            {
+                model.Errors["cellPhone"] = "Номер неверный";
+                return View("Index", model);
+            }
+
+            var code = 1111;
+            HttpContext.Session.SetInt32(cellPhone, code);
+            notificationService.SendConfirmationCode(cellPhone, code);
+
+            return View("Confirmation", new ConfirmationModel { OrderId = id, CellPhone = cellPhone });
+        }
+
+        [HttpPost]
+        public IActionResult StartDelivery(int id, string cellPhone, int code)
+        {
+            int? storedCode = HttpContext.Session.GetInt32(cellPhone);
+            if (storedCode == null)            
+                return View("Confirmation", new ConfirmationModel { OrderId = id, CellPhone = cellPhone, 
+                    Errors = new Dictionary<string, string> { { "code", "Пустой код" }}});
+            
+
+            if (storedCode != code)            
+                return View("Confirmation", new ConfirmationModel { OrderId = id, CellPhone = cellPhone, 
+                    Errors = new Dictionary<string, string> { { "code", "Неверный код" } } });
+
+            return View();
+        }
+
+        private bool IsValidCellPhone(string cellPhone)
+        {
+            if (cellPhone == null)
+                return false;
+
+            cellPhone = cellPhone.Replace(" ", "")
+                                 .Replace("-", "");
+
+            return Regex.IsMatch(cellPhone, @"^\+?\d{11}$");
         }
 
         private (Order o, Cart c) GetOrCreateOrderAndCart()
@@ -102,5 +154,7 @@ namespace Store.Web.Controllers
             cart.TotalPrice = order.TotalPrice;
             HttpContext.Session.Set(cart);
         }
+
     }
+
 }
