@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Store.Contractors;
+using Store.Web.Contractors;
 using Store.Web.Models;
 using System;
 using System.Collections.Generic;
@@ -16,19 +17,22 @@ namespace Store.Web.Controllers
         readonly IOrderRepositoty orderRepositoty;
         readonly IEnumerable<IDeliveryService> deliveryServices;
         readonly IEnumerable<IPaymentService> paymentServices;
+        readonly IEnumerable<IWebContractorService> webContractorServices;
         readonly INotificationService notificationService;
 
         public OrderController(
-            IBookRepository bookRepository, 
-            IOrderRepositoty orderRepositoty, 
-            IEnumerable<IDeliveryService> deliveryServices, 
+            IBookRepository bookRepository,
+            IOrderRepositoty orderRepositoty,
+            IEnumerable<IDeliveryService> deliveryServices,
             IEnumerable<IPaymentService> paymentServices,
+            IEnumerable<IWebContractorService> webContractorServices,
             INotificationService notificationService)
         {
             this.bookRepository = bookRepository;
             this.orderRepositoty = orderRepositoty;
             this.deliveryServices = deliveryServices;
             this.paymentServices = paymentServices;
+            this.webContractorServices = webContractorServices;
             this.notificationService = notificationService;
         }
 
@@ -181,9 +185,14 @@ namespace Store.Web.Controllers
         [HttpPost]
         public IActionResult StartPayment(int id, string uniqueCode)
         {
-            var _paymentService = paymentServices.Single(s => s.UniqueCode == uniqueCode);
+            var paymentService = paymentServices.Single(s => s.UniqueCode == uniqueCode);
             var order = orderRepositoty.GetById(id);
-            var form = _paymentService.CreateForm(order);
+            var form = paymentService.CreateForm(order);
+
+            var webContractorService = webContractorServices.SingleOrDefault(s => s.UniqueCode == uniqueCode);
+            if (webContractorService != null)
+                return Redirect(webContractorService.GetUri);
+
             return View("PaymentStep", form);
         }
 
@@ -204,6 +213,12 @@ namespace Store.Web.Controllers
             }
 
             return View("PaymentStep", form);
+        }
+
+        public IActionResult Finish()
+        {
+            HttpContext.Session.RemoveCart();
+            return View();
         }
 
         private bool IsValidCellPhone(string cellPhone)
