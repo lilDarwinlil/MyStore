@@ -15,17 +15,20 @@ namespace Store.Web.Controllers
         readonly IBookRepository bookRepository;
         readonly IOrderRepositoty orderRepositoty;
         readonly IEnumerable<IDeliveryService> deliveryServices;
+        readonly IEnumerable<IPaymentService> paymentServices;
         readonly INotificationService notificationService;
 
         public OrderController(
             IBookRepository bookRepository, 
             IOrderRepositoty orderRepositoty, 
             IEnumerable<IDeliveryService> deliveryServices, 
+            IEnumerable<IPaymentService> paymentServices,
             INotificationService notificationService)
         {
             this.bookRepository = bookRepository;
             this.orderRepositoty = orderRepositoty;
             this.deliveryServices = deliveryServices;
+            this.paymentServices = paymentServices;
             this.notificationService = notificationService;
         }
 
@@ -126,7 +129,9 @@ namespace Store.Web.Controllers
                 return View("Confirmation", new ConfirmationModel { OrderId = id, CellPhone = cellPhone, 
                     Errors = new Dictionary<string, string> { { "code", "Неверный код" } } });
 
-            //
+            var order = orderRepositoty.GetById(id);
+            order.CellPhone = cellPhone;
+            orderRepositoty.Update(order);
 
             HttpContext.Session.Remove(cellPhone);
 
@@ -153,14 +158,52 @@ namespace Store.Web.Controllers
         {
             var deliveryService = deliveryServices.Single(s => s.UniqueCode == uniqueCode);
 
-            var form = deliveryService.MoveNext(id, step, values);
+            var form = deliveryService.MoveNextForm(id, step, values);
             
             if (form.IsFinal)
             {
-                return null;
+                var order = orderRepositoty.GetById(id);
+                order.Delivery = deliveryService.GetDelivery(form);
+                orderRepositoty.Update(order);
+
+                var model = new DeliveryModel
+                {
+                    OrderId = id,
+                    Methods = paymentServices.ToDictionary(s => s.UniqueCode, s => s.Title),
+                };
+
+                return View("PaymentMethod", model);
             }
 
             return View("DeliveryStep", form);
+        }
+
+        [HttpPost]
+        public IActionResult StartPayment(int id, string uniqueCode)
+        {
+            var _paymentService = paymentServices.Single(s => s.UniqueCode == uniqueCode);
+            var order = orderRepositoty.GetById(id);
+            var form = _paymentService.CreateForm(order);
+            return View("PaymentStep", form);
+        }
+
+        [HttpPost]
+        public IActionResult NextPayment(int id, string uniqueCode, int step, Dictionary<string, string> values)
+        {
+            var _paymentService = paymentServices.Single(s => s.UniqueCode == uniqueCode);
+
+            var form = _paymentService.MoveNextForm(id, step, values);
+
+            if (form.IsFinal)
+            {
+                var order = orderRepositoty.GetById(id);
+                order.Payment = _paymentService.GetPayment(form);
+                orderRepositoty.Update(order);
+
+                return View("Finish");
+            }
+
+            return View("PaymentStep", form);
         }
 
         private bool IsValidCellPhone(string cellPhone)
