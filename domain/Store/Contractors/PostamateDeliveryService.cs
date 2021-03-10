@@ -61,7 +61,7 @@ namespace Store.Contractors
             return new OrderDelivery(UniqueCode, description, 150m, parameters);
         }
 
-        public Form CreateForm(Order order)
+        public Form CreateForm(OrderItem order)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));

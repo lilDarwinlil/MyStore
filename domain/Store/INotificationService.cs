@@ -8,8 +8,8 @@ namespace Store
 
         Task SendConfirmationCodeAsync(string cellPhone, int code);
 
-        void StartProcess(Order order);
+        void StartProcess(OrderItem order);
 
-        Task StartProcessAsync(Order order);
+        Task StartProcessAsync(OrderItem order);
     }
 }

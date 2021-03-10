@@ -9,7 +9,7 @@ namespace Store.Contractors
 
         public string Title => "Оплата наличными";
 
-        public Form CreateForm(Order order)
+        public Form CreateForm(OrderItem order)
         {
             return new Form(UniqueCode, order.Id,1,false,new Field[0]);
         }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Store
 {
-    public class Order
+    public class OrderItem
     {
         public int Id { get; }
 
@@ -22,7 +22,7 @@ namespace Store
 
         public decimal TotalPrice => items.Sum(item => item.Price * item.Count) + (Delivery?.Amount ?? 0m); 
 
-        public Order(int id,IEnumerable<OrderItem> items)
+        public OrderItem(int id,IEnumerable<OrderItem> items)
         {
             if (items == null)
                 throw new ArgumentNullException(nameof(items));
@@ -48,7 +48,7 @@ namespace Store
 
             var index = items.FindIndex(i => i.BookId == book.Id);
             if (index == -1)
-                items.Add(new OrderItem(book.Id, count, book.Price));
+                items.Add(new OrderItem(book.Id, book.Price, count));
             else
                 items[index].Count += count;
         }

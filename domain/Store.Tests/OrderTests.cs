@@ -7,18 +7,18 @@ namespace Store.Tests
 {
     public class OrderTests
     {
-        Order GenerateOrders => new Order(1, new[] { new OrderItem(1, 5, 10m), new OrderItem(2, 10, 100m) });
+        OrderItem GenerateOrders => new OrderItem(1, new[] { new OrderItem(1, 10m, 5), new OrderItem(2, 100m, 10) });
 
         [Fact]
         public void Order_WithNullItems_ThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new Order(1, null));
+            Assert.Throws<ArgumentNullException>(() => new OrderItem(1, null));
         }
 
         [Fact]
         public void TotalCount_WithEmptyItems_ReturnZero()
         {
-            Assert.Equal(0m, (new Order(1, new OrderItem[0])).TotalCount);
+            Assert.Equal(0m, (new OrderItem(1, new OrderItem[0])).TotalCount);
         }
 
         [Fact]

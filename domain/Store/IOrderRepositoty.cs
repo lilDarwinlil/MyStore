@@ -6,10 +6,10 @@ namespace Store
 {
     public interface IOrderRepositoty
     {
-        Order Create();
+        OrderItem Create();
 
-        Order GetById(int id);
+        OrderItem GetById(int id);
 
-        void Update(Order order);
+        void Update(OrderItem order);
     }
 }

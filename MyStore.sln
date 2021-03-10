@@ -20,11 +20,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Store.Web", "presentation\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Store.Tests", "domain\Store.Tests\Store.Tests.csproj", "{813B4CB6-74D5-4BB6-A687-DC925C78F2C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.Web.Contractors", "presentation\Store.Web.Contractors\Store.Web.Contractors.csproj", "{A98690F4-9258-40CA-A2B4-8286C15D0A40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Store.Web.Contractors", "presentation\Store.Web.Contractors\Store.Web.Contractors.csproj", "{A98690F4-9258-40CA-A2B4-8286C15D0A40}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{FF24555B-80E2-404F-B092-F30DC96FDBE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.YandexKassa", "plugins\Store.YandexKassa\Store.YandexKassa.csproj", "{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Store.YandexKassa", "plugins\Store.YandexKassa\Store.YandexKassa.csproj", "{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aplication", "aplication", "{70C28BB1-DC7D-4511-9542-3F30BC2ADDDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.Web.App", "aplication\Store.Web.App\Store.Web.App.csproj", "{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +112,18 @@ Global
 		{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42}.Release|x64.Build.0 = Release|Any CPU
 		{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42}.Release|x86.ActiveCfg = Release|Any CPU
 		{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42}.Release|x86.Build.0 = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|x64.Build.0 = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Debug|x86.Build.0 = Debug|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|x64.ActiveCfg = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|x64.Build.0 = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|x86.ActiveCfg = Release|Any CPU
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +135,7 @@ Global
 		{813B4CB6-74D5-4BB6-A687-DC925C78F2C3} = {64C611DC-EED6-41E4-9EA9-718242787799}
 		{A98690F4-9258-40CA-A2B4-8286C15D0A40} = {4C6F5230-7D22-4F73-8C51-26D5C4C7E887}
 		{F64F65E5-5CC5-4094-848B-CBBC1D1D2D42} = {FF24555B-80E2-404F-B092-F30DC96FDBE0}
+		{3550C6FE-5A2F-4E21-99F5-EA4B8297CF5E} = {70C28BB1-DC7D-4511-9542-3F30BC2ADDDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {727604C5-75AB-4F43-BDD2-4D98F5A1ABB2}

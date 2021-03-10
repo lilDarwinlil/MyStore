@@ -50,7 +50,7 @@ namespace Store.Web.Controllers
             return View("Empty");
         }
 
-        OrderModel Map(Order order)
+        OrderModel Map(OrderItem order)
         {
             var bookIds = order.Items.Select(i => i.BookId);
             var books = bookRepository.GetAllByIds(bookIds);
@@ -76,7 +76,7 @@ namespace Store.Web.Controllers
         [HttpPost]
         public IActionResult AddItem(int bookId, int count = 1)
         {
-            (Order order, Cart cart) = GetOrCreateOrderAndCart();
+            (OrderItem order, Cart cart) = GetOrCreateOrderAndCart();
             var book = bookRepository.GetById(bookId);
             order.AddOrUpdateItem(book, count);
             SaveOrderAndCart(order, cart);
@@ -86,7 +86,7 @@ namespace Store.Web.Controllers
         [HttpPost]
         public IActionResult UpdateItem(int bookId, int count)
         {
-            (Order order, Cart cart) = GetOrCreateOrderAndCart();
+            (OrderItem order, Cart cart) = GetOrCreateOrderAndCart();
             order.Get(bookId).Count = count;
             SaveOrderAndCart(order, cart);
             return RedirectToAction("Index", "Order");
@@ -95,7 +95,7 @@ namespace Store.Web.Controllers
         [HttpPost]
         public IActionResult RemoveItem (int bookId)
         {
-            (Order order, Cart cart) = GetOrCreateOrderAndCart();
+            (OrderItem order, Cart cart) = GetOrCreateOrderAndCart();
             order.RemoveItem(bookId);
             SaveOrderAndCart(order, cart);
             return RedirectToAction("Index", "Order");
@@ -232,9 +232,9 @@ namespace Store.Web.Controllers
             return Regex.IsMatch(cellPhone, @"^\+?\d{11}$");
         }
 
-        private (Order o, Cart c) GetOrCreateOrderAndCart()
+        private (OrderItem o, Cart c) GetOrCreateOrderAndCart()
         {
-            Order order;
+            OrderItem order;
             if (HttpContext.Session.TryGetCart(out Cart cart))
                 order = orderRepositoty.GetById(cart.OrderId);
             else
@@ -245,7 +245,7 @@ namespace Store.Web.Controllers
             return (order, cart);
         }
 
-        private void SaveOrderAndCart(Order order, Cart cart)
+        private void SaveOrderAndCart(OrderItem order, Cart cart)
         {
             orderRepositoty.Update(order);
 
